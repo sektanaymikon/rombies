@@ -1,0 +1,219 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return activeUser() && exists(/databases/$(database)/documents/adminSessions/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminSessions/$(request.auth.uid)).data.expiresAt > request.time;
+    }
+    function banned(uid) {
+      return exists(/databases/$(database)/documents/bans/$(uid))
+        && get(/databases/$(database)/documents/bans/$(uid)).data.active == true;
+    }
+    function activeUser() { return signedIn() && !banned(request.auth.uid); }
+    function chatOpen() {
+      return exists(/databases/$(database)/documents/social/config)
+        && get(/databases/$(database)/documents/social/config).data.chatEnabled == true;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function validHandle(handle) {
+      return handle is string && handle.matches('^[a-z0-9_]{3,20}$');
+    }
+    function validProfile(uid) {
+      let d = request.resource.data;
+      return d.keys().hasAll(['uid', 'handle', 'displayName', 'createdAt', 'updatedAt'])
+        && d.keys().hasOnly(['uid', 'handle', 'displayName', 'createdAt', 'updatedAt'])
+        && d.uid == uid
+        && validHandle(d.handle)
+        && d.displayName is string && d.displayName.size() >= 1 && d.displayName.size() <= 32
+        && d.createdAt is timestamp && d.updatedAt == request.time;
+    }
+    function claimedBy(handle, uid) {
+      return getAfter(/databases/$(database)/documents/usernames/$(handle)).data.uid == uid;
+    }
+    function hasProfile() {
+      return activeUser() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function validFight() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['ownerId', 'ownerHandle', 'title', 'description', 'public', 'config', 'schemaVersion', 'createdAt', 'updatedAt'])
+        && d.keys().hasOnly(['ownerId', 'ownerHandle', 'title', 'description', 'public', 'config', 'schemaVersion', 'createdAt', 'updatedAt'])
+        && d.ownerId == request.auth.uid
+        && d.ownerHandle == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 80
+        && d.description is string && d.description.size() <= 1000
+        && d.public is bool
+        && d.config is string && d.config.size() >= 2 && d.config.size() <= 220000
+        && d.schemaVersion == 1
+        && d.createdAt is timestamp && d.updatedAt == request.time;
+    }
+    function canReadFight() {
+      return resource.data.public == true || isOwner(resource.data.ownerId);
+    }
+
+    // Claim a handle and create its profile together in one atomic batch.
+    match /usernames/{handle} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if activeUser() && validHandle(handle)
+        && request.resource.data.keys().hasAll(['uid', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle == handle;
+      allow update, delete: if false;
+    }
+
+    // Profiles contain public display information, never email or passwords.
+    match /users/{uid} {
+      allow get: if true;
+      allow list: if hasProfile() && request.query.limit != null && request.query.limit <= 100;
+      allow create: if isOwner(uid) && activeUser() && validProfile(uid)
+        && request.resource.data.createdAt == request.time
+        && claimedBy(request.resource.data.handle, uid);
+      allow update: if isOwner(uid) && activeUser() && validProfile(uid)
+        && request.resource.data.handle == resource.data.handle
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if false;
+
+      match /bookmarks/{fightId} {
+        allow get: if isOwner(uid);
+        allow list: if isOwner(uid) && request.query.limit != null && request.query.limit <= 24;
+        allow create: if isOwner(uid) && activeUser()
+          && request.resource.data.keys().hasAll(['createdAt'])
+          && request.resource.data.keys().hasOnly(['createdAt'])
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+        allow delete: if isOwner(uid) && activeUser();
+      }
+    }
+
+    match /fights/{fightId} {
+      allow get: if canReadFight();
+      // Discover queries must filter public == true; My Fights queries filter ownerId.
+      allow list: if request.query.limit != null && request.query.limit <= 24 && canReadFight();
+      allow create: if hasProfile() && validFight() && request.resource.data.createdAt == request.time;
+      allow update: if isOwner(resource.data.ownerId) && hasProfile() && validFight()
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.ownerHandle == resource.data.ownerHandle
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner(resource.data.ownerId) && activeUser() && resource.data.public == false;
+    }
+
+    // Shared-password admin access requested by the game creator. No role setup.
+    // Anyone who knows 0219 can unlock a one-hour session for their own account.
+    match /adminSessions/{uid} {
+      allow get: if isOwner(uid);
+      allow list: if false;
+      allow create, update: if isOwner(uid) && activeUser()
+        && request.resource.data.keys().hasOnly(['password','createdAt','expiresAt'])
+        && request.resource.data.password == '0219'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(3605,'s');
+      allow delete: if isOwner(uid);
+    }
+    match /bans/{uid} {
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin() && request.query.limit != null && request.query.limit <= 100;
+      allow create, update: if isAdmin() && activeUser() && request.auth.uid != uid
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.resource.data.keys().hasOnly(['active','handle','reason','by','updatedAt'])
+        && request.resource.data.active is bool
+        && request.resource.data.handle == get(/databases/$(database)/documents/users/$(uid)).data.handle
+        && request.resource.data.reason is string && request.resource.data.reason.size() <= 300
+        && request.resource.data.by == request.auth.uid && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    function validNotice() {
+      let d=request.resource.data;
+      return hasProfile() && isAdmin()
+        && d.keys().hasOnly(['body','by','handle','createdAt','expiresAt'])
+        && d.body is string && d.body.size() >= 1 && d.body.size() <= 500
+        && d.by == request.auth.uid
+        && d.handle == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle
+        && d.createdAt == request.time && d.expiresAt is timestamp
+        && d.expiresAt > request.time && d.expiresAt <= request.time + duration.value(3605,'s');
+    }
+    match /social/{id} {
+      allow get: if id in ['config','announcement'];
+      allow list: if false;
+      allow create, update: if (id == 'announcement' && validNotice())
+        || (id == 'config' && isAdmin() && activeUser()
+          && request.resource.data.keys().hasOnly(['chatEnabled','by','updatedAt'])
+          && request.resource.data.chatEnabled is bool
+          && request.resource.data.by == request.auth.uid && request.resource.data.updatedAt == request.time);
+      allow delete: if id == 'announcement' && isAdmin() && activeUser();
+    }
+    match /notices/{uid} {
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if false;
+      allow create, update: if exists(/databases/$(database)/documents/users/$(uid)) && validNotice();
+      allow delete: if false;
+    }
+    match /chatRates/{uid} {
+      allow get: if isOwner(uid);
+      allow list, delete: if false;
+      allow create: if isOwner(uid) && hasProfile() && (chatOpen() || isAdmin())
+        && request.resource.data.keys().hasOnly(['sentAt','messagePath']) && request.resource.data.sentAt == request.time
+        && request.resource.data.messagePath is string && request.resource.data.messagePath.size() <= 350;
+      allow update: if isOwner(uid) && hasProfile() && (chatOpen() || isAdmin())
+        && request.resource.data.keys().hasOnly(['sentAt','messagePath']) && request.resource.data.sentAt == request.time
+        && request.resource.data.messagePath is string && request.resource.data.messagePath.size() <= 350
+        && request.time >= resource.data.sentAt + duration.value(2,'s');
+    }
+    function validMessage(path) {
+      let d=request.resource.data;
+      let rate=/databases/$(database)/documents/chatRates/$(request.auth.uid);
+      return hasProfile() && (chatOpen() || isAdmin())
+        && d.keys().hasOnly(['senderId','handle','body','createdAt'])
+        && d.senderId == request.auth.uid
+        && d.handle == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle
+        && d.body is string && d.body.size() >= 1 && d.body.size() <= 1000 && d.createdAt == request.time
+        && getAfter(rate).data.sentAt == request.time
+        && getAfter(rate).data.messagePath == path
+        && (!exists(rate) || request.time >= get(rate).data.sentAt + duration.value(2,'s'));
+    }
+    match /globalMessages/{message} {
+      allow get: if hasProfile() && (chatOpen() || isAdmin());
+      allow list: if hasProfile() && (chatOpen() || isAdmin()) && request.query.limit != null && request.query.limit <= 50;
+      allow create: if validMessage('globalMessages/'+message);
+      allow update, delete: if false;
+    }
+    function member(data) { return hasProfile() && request.auth.uid in data.members; }
+    match /threads/{id} {
+      allow get: if hasProfile() && (!exists(/databases/$(database)/documents/threads/$(id)) || member(resource.data));
+      allow list: if member(resource.data) && request.query.limit != null && request.query.limit <= 30;
+      allow create: if hasProfile() && (chatOpen() || isAdmin())
+        && request.resource.data.keys().hasOnly(['members','createdAt'])
+        && request.resource.data.members is list && request.resource.data.members.size() == 2
+        && request.resource.data.members[0] is string && request.resource.data.members[1] is string
+        && request.resource.data.members[0] != request.resource.data.members[1]
+        && request.auth.uid in request.resource.data.members
+        && id == request.resource.data.members[0] + '~' + request.resource.data.members[1]
+        && exists(/databases/$(database)/documents/users/$(request.resource.data.members[0]))
+        && exists(/databases/$(database)/documents/users/$(request.resource.data.members[1]))
+        && !banned(request.resource.data.members[0]) && !banned(request.resource.data.members[1])
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+      match /messages/{message} {
+        function conversation() { return getAfter(/databases/$(database)/documents/threads/$(id)).data; }
+        allow get: if member(conversation()) && (chatOpen() || isAdmin());
+        allow list: if member(conversation()) && (chatOpen() || isAdmin()) && request.query.limit != null && request.query.limit <= 50;
+        allow create: if validMessage('threads/'+id+'/messages/'+message) && member(conversation())
+          && !banned(conversation().members[0]) && !banned(conversation().members[1]);
+        allow update, delete: if false;
+      }
+    }
+
+    // All other collections remain closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

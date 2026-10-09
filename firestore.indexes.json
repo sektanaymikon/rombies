@@ -1,0 +1,9 @@
+{
+  "indexes": [
+    {"collectionGroup":"fights","queryScope":"COLLECTION","fields":[{"fieldPath":"public","order":"ASCENDING"},{"fieldPath":"updatedAt","order":"DESCENDING"}]},
+    {"collectionGroup":"fights","queryScope":"COLLECTION","fields":[{"fieldPath":"ownerId","order":"ASCENDING"},{"fieldPath":"updatedAt","order":"DESCENDING"}]}
+  ],
+  "fieldOverrides": [
+    {"collectionGroup":"fights","fieldPath":"config","indexes":[]}
+  ]
+}

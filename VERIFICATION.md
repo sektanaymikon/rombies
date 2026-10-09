@@ -1,3 +1,15 @@
+# Automatic saving and shared music — October 9
+
+- Every editor change immediately saves a local draft, including music, sprites, attacks, obstacle transforms and arena settings.
+- Existing online fights sync automatically after a short pause. Music and artwork are uploaded to R2 and shared fight configs contain public URLs. Repeated saves reuse uploaded files.
+- Online updates preserve published/unpublished status. New fights need Publish once before they appear in Discover.
+- If sync fails, the local draft remains saved. Retry online save sends it again. Automatically saved drafts retain their online fight link.
+- Normal battle settings now include Music volume controls.
+
+Install this update: upload all files from Rombies-GitHub-fixes.zip to the repository root, replacing matching filenames, including the ten customize-v7 files. Replace CodeHS index.html with CodeHS-small-index.html. No additional backend change is needed if the previous admin/chat backend is already deployed. For an older fight whose music was only local, open its latest local draft, select the music and press Update/Publish once to link that saved draft to the online fight.
+
+63 focused automated checks passed in this update: 10 autosave, 10 cloud, 15 GIF/music media, 11 audio and 17 customization. These use local mocks and make no production writes. JavaScript syntax and archive/file-size checks are run during packaging.
+
 # Shared-password admin panel, chat and rotated hitboxes — October 9
 
 - Sandbox now has an Admin panel button. Password 0219 directly unlocks controls; no manually granted Firebase administrator or Admin SDK is required. An existing username is used or one is connected automatically. Sessions last one hour and closing the panel locks it.
@@ -6,7 +18,7 @@
 - Rotated obstacles now use oriented geometry for movement, cover, platforms, damage/heal/bounce areas, melee, projectiles and beams. The visible rectangular shape and physics share their rotation.
 - Preserves Chapter One normal battle presentation/fullscreen, creator-only Playtest layout, separate arena sizing, drag/resize/rotate/mirror controls, GIFs and custom music.
 
-Install: upload every file from Rombies-GitHub-fixes.zip, including ten customize-v6 files. Publish the complete updated firestore.rules and deploy the updated upload Worker from Rombies-Sandbox-Backend.zip. Then replace CodeHS index.html with CodeHS-small-index.html. Keep existing images, variables and R2 binding. No Realtime Database, new secret or manual admin registration is needed. ADMIN-CHAT-SETUP.md gives every step.
+Install: upload every file from Rombies-GitHub-fixes.zip, including ten customize-v7 files. Publish the complete updated firestore.rules and deploy the updated upload Worker from Rombies-Sandbox-Backend.zip. Then replace CodeHS index.html with CodeHS-small-index.html. Keep existing images, variables and R2 binding. No Realtime Database, new secret or manual admin registration is needed. ADMIN-CHAT-SETUP.md gives every step.
 
 173 automated checks passed: 24 engine/story/presentation, 17 customization, 10 selection handles, 14 GIF/music storage, 15 Worker, 9 cloud, 11 audio, 3 music schema, 8 obstacle/deletion, 10 rotated physics and 52 real Firestore emulator access checks. Browser checks used the real Firebase Web SDK against only the local demo emulator: shared-password unlock without a role, global announcements, private notices, live two-account DMs, ban/unban and chat disable/enable. No production publishing, moderation or deployment was performed.
 
