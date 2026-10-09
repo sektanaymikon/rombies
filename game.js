@@ -17,7 +17,7 @@ const assetsReady = Promise.all(paths.map(path => new Promise(resolve => {
 })));
 const spritePath = key => ASSETS.sprites[key] || ASSETS.sprites[CHAR[key]?.sprite];
 const pic = key => images[spritePath(key)];
-const freshSave = () => ({version:2, checkpoint:{battleId:BATTLES[0].id, phase:'scene', wave:0}, completed:[], difficulty:1, music:.22});
+const freshSave = () => ({version:2, checkpoint:{battleId:BATTLES[0].id, phase:'scene', wave:0}, completed:[], difficulty:1, music:.22, wiggle:true});
 let save = freshSave();
 try {
  const data = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
@@ -550,7 +550,7 @@ function motif(name,x,y,size,color,angle=0){
 function drawActor(a){
  if(a.banished)return;if(a.hp<=0&&a.deadTime>1.5)return;
  const control=a===player(),event=state.event?.actor===a?state.event:null;
- let height=132*a.scale,width=155*a.scale,bob=a.move?Math.sin(state.visualTime*13+a.id)*4:Math.sin(state.visualTime*2+a.id)*1.5;
+ let height=132*a.scale,width=155*a.scale,bob=a.move?(save.wiggle!==false?Math.sin(state.visualTime*13+a.id)*4:0):Math.sin(state.visualTime*2+a.id)*1.5;
  if(a.key.includes('mech')){height*=1.3;width*=1.5;}if(a.key==='rombie_carrier'){height*=1.2;width*=1.4;}
  let x=a.x,y=FLOOR-a.z+bob,rotation=a.attack>0?Math.sin(a.attack*12)*.09*a.face:0,alpha=a.invisible>0?.23:1;
  if(a.phase>0)alpha=.5;
@@ -750,6 +750,7 @@ document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>menu());$('end
 $('resumeBtn').onclick=()=>pause(false);$('restartBtn').onclick=()=>state.mode==='scene'?startScene(state.index,state.independent):startBattle(state.index,state.independent);$('quitBtn').onclick=()=>menu();
 $('settingsBtn').onclick=()=>{state.settingsWasPaused=state.paused;if(['battle','scene','maze'].includes(state.mode)){state.paused=true;keys.clear();}$('settingsModal').classList.add('open');music.start();music.update();};
 $('closeSettings').onclick=()=>{$('settingsModal').classList.remove('open');state.paused=!!state.settingsWasPaused;music.update();};
+if($('movementWiggle')){$('movementWiggle').checked=save.wiggle!==false;$('movementWiggle').onchange=e=>{save.wiggle=e.target.checked;persist();};}
 $('difficulty').value=String(save.difficulty);$('difficulty').onchange=e=>{save.difficulty=Number(e.target.value);persist();toast('Difficulty applies when an encounter starts.');};
 $('musicVolume').value=String(Math.round(save.music*100));$('musicVolume').oninput=e=>{save.music=Number(e.target.value)/100;persist();music.start();};
 $('creditsBtn').onclick=()=>$('credits').style.display=$('credits').style.display==='none'?'block':'none';

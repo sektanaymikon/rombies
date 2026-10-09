@@ -12,7 +12,7 @@
 
 13 game check groups cover every scene and cue, all 31 encounter configurations, all shipped art references, schema limits, unsafe URL rejection, pause/QTE behavior, parries, damage/shields/healing/status effects, time stop, friendly fire, cover/projectile collisions, platform jumping, waves, team switching and ending conditions.
 
-9 Worker check groups cover health/config, disabled uploads, missing or rejected login tokens, image type/size checks, content-addressed uploads, image reads, duplicate reuse, CORS and invalid paths. Google login verification and R2 were mocked; no live images were uploaded by these tests.
+11 Worker check groups cover health/config, disabled uploads, missing or rejected login tokens, image type/size checks, content-addressed uploads, image reads, duplicate reuse, GIF byte/type/dimension checks, CORS and invalid paths. Google login verification and R2 were mocked; no live images were uploaded by these tests.
 
 7 Firebase-client check groups cover atomic username claims, duplicate handles, fight create/update ownership fields, bounded Discover/owner queries, bookmark idempotency, upload validation and fight lookup/deletion. The Firebase SDK was mocked; these are client-contract checks, not a Firestore security-rules emulator run.
 
@@ -32,3 +32,45 @@ All release JavaScript passes syntax checking. ZIP integrity, the flat package's
 ## Remaining verification limits
 
 The full campaign has not been manually won encounter by encounter. Automated rendering checks verify scene/cue execution, not pixel-for-pixel slide fidelity. Live publishing, account recovery and R2 uploading await the online setup described in ONLINE-SETUP.md. The Firestore rules have not been run in the Firebase emulator. No production fights or usernames were created during testing. Browser gameplay checks used the source build over local HTTP; the in-app browser blocks file:// navigation, so the flattened package was verified through its complete path/image/syntax/archive checks instead.
+# October 9 animated GIF update
+
+The latest update adds preserved GIF uploads to all artwork pickers, portable
+fight import/export, GIF rendering on the game canvas and GIF upload/download
+routes in the supplied Worker. Eleven GIF regression groups passed, including
+frame comparisons against Pillow for disposal modes 1/2/3, transparency,
+interlacing, looping and GIF87a. Eleven mocked Worker groups and all 24 existing
+engine/presentation groups passed. Browser checks confirmed actual Sandbox
+GIF upload, four distinct animated canvas frames and a battle with GIF artwork.
+No live account or R2 publishing writes were made. The Worker must be deployed
+by the user to enable GIF publishing in their current online setup.
+
+## October 9 Sandbox customization update
+
+Fifteen additional regression groups passed for 0–10 regular attacks, keyboard
+and touch slot 10, AI ultimate separation, sticky cardinal aim, horizontal
+facing and manual mirrors, aim preservation through character switching,
+optional wiggle, uploaded artwork for all nine attack behaviors, temporary
+attack poses, every object's transforms, actual custom arena dimensions,
+directional beams/cover, sprite stretching, independent collision sizes,
+jump strength, optional labels and stable drag resizing from original geometry.
+All 24 engine/presentation, 11 GIF, 11 Worker and 7 Firebase-client groups were
+also rerun successfully (68 groups total).
+
+Browser checks used the delivered replacement HTML with the existing pinned
+GitHub CDN assets. An exported test fight containing uploaded transparent
+attack artwork was imported through the actual file picker. Its ten attacks,
+mirrors, disabled wiggle, rotation and optional pose survived import. Melee
+artwork and the temporary Hammer-form pose were visibly rendered in combat;
+both the attack-10 button and keyboard 0 triggered its cooldown. The actual
+battle canvas used the configured 2000 × 1100 dimensions, and fullscreen fit
+the complete arena. At 390 × 844, all twelve ability controls fit in three
+columns within the viewport. A real arena-corner drag changed it to 1780 × 960
+and scaled the floor from Y 917 to Y 800 without rounding drift. Rotation drag,
+undo and redo were checked in the editor. The Chapter One movement-wiggle
+checkbox retained its value when settings were reopened; the original value
+was restored afterward. No browser console errors were reported.
+
+Proof: Rombies-Sandbox-customization-check.png accompanies the release files.
+No test fight was published, and no external deployment was made. Online
+Firebase/R2 behavior remains subject to the verification limits above.
+

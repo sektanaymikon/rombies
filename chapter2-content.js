@@ -121,14 +121,47 @@
  const encounters=rows.map((r,i)=>({id:r[0],title:r[1],arc:r[2],start:r[3],after:r[4],party:r[5],waves:r[6],brief:r[7],hint:r[8],mechanic:r[9]||'',index:i+1,hazard:r[9]==='ceiling',qte:['clash','rhythm','prediction','rewind','lead','survive'].includes(r[9])?{at:12,title:r[9]==='lead'?'LEAD EXTRACTION · STRIKE!':r[9]==='rhythm'?'KEEP THE BEAT':r[9]==='rewind'?'REVERSE THE UNIVERSE':'DOMAIN CLASH',sequence:r[9]==='lead'?['ArrowRight','Space']:r[9]==='rewind'?['ArrowLeft','KeyF','ArrowLeft','Space']:['KeyF','ArrowRight','KeyF','Space'],seconds:9}:null}));
  function bgAt(n){const s=ROMBIES_SCENES[n-1];return s?.items.find(o=>o.t==='image'&&o.w>850&&o.h>390)?.asset||'bg:desert';}
  const backgrounds=[['Culling games',1],['Pyramid',300],['Jupiter road',351],['Living room',376],['Mansion',411],['Jupiter',450],['Gmod village',465],['Gerson’s study',277],['Battlefield',690],['Ruined church',705],['Star sea',730],['House interior',750],['Water',775],['The end',900]].map(([name,n])=>({name,key:bgAt(n)}));
+ // Battle scenery is selected from the fight itself, including its authored masks.
+ const stages={charlie:[3,566],mick:[17,594],beatbox:[85,560],arrow:[107,620],eagle:[151,600],amber:[151,600],monkey:[245,562],spamton:[289,610],pyramid:[310,625],lightspeed:[342,625],jane:[359,600],retep:[391,585],betrayal:[402,595],dio:[431,600],jupiter:[459,600],hunger:[480,645],neo:[512,650],army:[532,600],vessel:[564,590],kyrara:[575,590],dhruv:[603,600],chaos:[633,600],titan:[637,485],overlord:[661,645],lastAcid:[705,635],heavensDoor:[730,582],house:[749,600],water:[772,560],asun:[790,640],rewind:[825,640],reckoning:[845,620]};
+ const speakerAliases={m009:'Shane',m067:'Shane',m081:'Shane',m078:'Shane',m096:'Leonard',m156:'Leonard',m150:'Ada',m118:'Ada',m097:'Vivi',m182:'Raph',m185:'Raph',m162:'Raph',m184:'Oliver',m158:'Retep',m103:'Retep',m085:'John Rod',m009:'Shane',m094:'Kyrara',m031:'Myguna'};
+ function linesAt(slide,cue=100){
+  const source=typeof slide==='number'?ROMBIES_SCENES[slide-1]:slide;if(!source)return [];
+  const images=source.items.filter(o=>o.asset&&o.id!=='background'&&o.w<800&&o.h>40&&o.asset!=='m000');
+  return source.items.filter(o=>o.text&&(cue===100||!(source.cues||[]).some((g,i)=>g.some(e=>e.targets.some(id=>[o.id,...(o.groups||[])].includes(id))&&((e.kind==='entr'&&cue<i+1)||(e.kind==='exit'&&cue>=i+1)))))).map(o=>{
+   const text=o.text.map(p=>p.text).join(' ').trim();const explicit=text.match(/(?:^|[-–]\s*)(Shane|Max|Raph|Raleigh|Leonard|Ada|Oliver|Nande|Saul|Vivi)\s*[:–-]/i)||text.match(/[-–]\s*(Shane|Max|Raph|Raleigh|Leonard|Ada|Oliver|Nande|Vivi)\s*$/i);
+   const nearest=[...images].sort((a,b)=>{const dist=v=>Math.hypot((v.x+v.w/2)-(o.x+o.w/2),v.y-(o.y+o.h));return dist(a)-dist(b);})[0];
+   const f=Object.values(roster).find(f=>f.sprite===nearest?.asset);let speaker=explicit?.[1]||speakerAliases[nearest?.asset]||f?.name||'Narrator';
+   if(source.n>=635&&source.n<=648&&text&&!/Where am I|What the|NOOO/i.test(text))speaker='Max';
+   return {speaker,text,portrait:source.n>=637&&source.n<=648?'m171':nearest?.asset||f?.sprite||'',slide:source.n};
+  }).filter(l=>l.text&&l.text!=='•ᴗ•'&&!/^Editor |^The night of the living rombies$/i.test(l.text));
+ }
+ function encounterLines(e,phase='before'){
+  const nums=phase==='after'?[e.after+1,e.after+2]:e.id==='titan'?[637,641]:Array.from({length:e.after-e.start+1},(_,i)=>e.start+i);
+  const seen=new Set(),lines=nums.flatMap(n=>linesAt(n)).filter(l=>{if(seen.has(l.text))return false;seen.add(l.text);return !/^To |^Back to |^Later at |Domain clash|Mighty Eagle vs Myguna/i.test(l.text);});
+  return phase==='combat'?lines.slice(-2):phase==='before'?lines.slice(0,2):lines.slice(0,2);
+ }
+ function scenery(e,d){
+  const [n,y]=stages[e.id],s=ROMBIES_SCENES[n-1];d.background=s.items.find(o=>o.id==='background')?.asset||bgAt(n);d.floor={x:0,y,w:1280,h:720-y,color:'#29313e',visible:false};
+  let layers=s.items.filter(o=>o.t==='shape'&&!o.text&&o.w>120&&o.fill==='#000000');
+  if(e.id==='titan'){
+   layers=s.items.filter(o=>o.asset==='m166'||o.asset==='m167'||o.asset==='m165'||['8592','8594','8596','8606'].includes(o.id));
+   d.floor={...d.floor,visible:true,asset:'m166',color:'#24233e'};
+  }
+  if(e.id==='heavensDoor'){d.floor={x:0,y:582,w:1280,h:138,color:'#483c34',visible:true};}
+  if(e.id==='retep'||e.id==='betrayal'){d.floor={...d.floor,visible:true,color:'#383243'};}
+  d.scene={slide:n,ids:layers.map(o=>o.id),masks:e.id==='titan'?[{x:487.98,y:0,w:640,h:493.33,color:'#000000'}]:[]};
+  d.party.forEach((f,i)=>{f.x=150+i*105;});d.waves.forEach(w=>w.enemies.forEach((f,i)=>{f.x=850+i*100;}));
+  for(const o of d.obstacles)if(o.type==='heal'){o.y=y-30;}
+  return d;
+ }
  function makeFight(e){
-  const d={version:1,title:e.title,description:e.brief,background:bgAt(e.start+2),color:'#a8ebc5',mode:['survive','clash','escape','rewind'].includes(e.mechanic)?'survive':'defeat',duration:e.mechanic==='escape'?55:e.mechanic==='rewind'?25:42,gravity:1300,friendlyFire:false,playerDamage:1,enemyDamage:.75,music:e.arc==='World division'?'finale':'chaos',party:e.party.map(id=>structuredClone(roster[id])),waves:e.waves.map((ids,i)=>({name:e.title+(e.waves.length>1?' · Wave '+(i+1):''),delay:2,enemies:ids.map(id=>structuredClone(roster[id]))})),obstacles:[]};
+  const d={version:1,title:e.title,description:e.brief,background:bgAt(stages[e.id][0]),color:'#a8ebc5',mode:['survive','clash','escape','rewind'].includes(e.mechanic)?'survive':'defeat',duration:e.mechanic==='escape'?55:e.mechanic==='rewind'?25:42,gravity:1300,friendlyFire:false,playerDamage:1,enemyDamage:.75,music:e.arc==='World division'?'finale':'chaos',party:e.party.map(id=>structuredClone(roster[id])),waves:e.waves.map((ids,i)=>({name:e.title+(e.waves.length>1?' · Wave '+(i+1):''),delay:2,enemies:ids.map(id=>structuredClone(roster[id]))})),obstacles:[]};
   if(e.mechanic==='lead'||e.mechanic==='hunger')d.obstacles.push({name:e.mechanic==='lead'?'LEAD SUPPLY':'SNACK ZONE',type:'heal',x:65,y:570,w:170,h:30,color:'#8fc8b0',hp:100,damage:8});
   if(e.mechanic==='ice')d.obstacles=[{name:'FIRE',type:'hazard',x:390,y:565,w:350,h:35,color:'#fe7464',hp:100,damage:22},{name:'Ice step',type:'platform',x:380,y:455,w:160,h:24,color:'#aeeafe',hp:100,damage:1},{name:'Ice step',type:'platform',x:670,y:390,w:170,h:24,color:'#aeeafe',hp:100,damage:1}];
   if(e.id==='jupiter')d.obstacles=[{name:'Ship debris',type:'cover',x:540,y:460,w:110,h:140,color:'#728ba6',hp:220,damage:1}];
-  return S.fight(d);
+  return S.fight(scenery(e,d));
  }
  function template(){return S.fight({title:'My first ridiculous fight',description:'A little acid. A little chaos. A lot of Rombies.',party:[roster.shane,roster.leonard],waves:[{name:'Incoming Rombies',delay:2,enemies:[roster.rombie,roster.flying]},{name:'Boss time',delay:3,enemies:[roster.neo]}],background:'bg:desert',color:'#b8edc8',mode:'defeat',duration:90,gravity:1300,playerDamage:1,enemyDamage:1,music:'chaos',obstacles:[{name:'Cover',type:'cover',x:580,y:490,w:85,h:110,color:'#96afa9',hp:180,damage:10}]});}
  function featured(){return [makeFight(encounters[17]),makeFight(encounters[22]),makeFight(encounters[19]),S.fight({...template(),title:'Oops! All Metal',description:'Four evolutions, three waves, one very crowded arena.',party:[roster.metal,roster.neo],waves:[{name:'Neo',enemies:[roster.neo]},{name:'Super Neo',enemies:[roster.superNeo]},{name:'Overlord',enemies:[roster.overlord]}]})];}
- window.ROMBIES_CHAPTER2={roster,encounters,backgrounds,makeFight,template,featured};
+ window.ROMBIES_CHAPTER2={roster,encounters,backgrounds,makeFight,template,featured,linesAt,encounterLines,stages};
 })();

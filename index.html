@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06080d">
 <title>The Night Of The Living Rombies: Story Mode</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="chapter2-expansion.css?v=20261009">
+<link rel="stylesheet" href="chapter2-expansion.css?v=20261009sandbox">
 </head>
 <body>
 <div id="app"><div id="shell"><div id="stageWrap"><canvas id="game" width="1280" height="720"></canvas>
@@ -21,21 +21,21 @@
 <div id="battleSelect" class="screen"><div class="panel"><h2>Chapter 1 — Major Battles</h2><p class="small">Every encounter is available. Battle Select replays a fight; Continue Story resumes your story checkpoint.</p><div id="battleGrid"></div><div style="margin-top:14px"><button class="btn" data-back>Back</button></div></div></div>
 <div id="endChapter"><div class="panel"><div class="tag">Chapter 1 Complete</div><h1 class="title">Rombies 1<br><span class="green">Complete</span></h1><p class="sub">The animated Rombies arc ends here. Chapter 2 is coming soon. Modulo remains TBD.</p><div class="menuBtns"><button class="btn primary" id="endMenu">Return to Menu</button><button class="btn" id="endBattles">Battle Select</button><button class="btn" id="replayBtn">Replay Story</button></div></div></div>
 <button id="settingsBtn">⚙ Settings</button>
-<div id="settingsModal" class="modal"><div class="modalCard"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2>Settings</h2><button class="btn" id="closeSettings">Close</button></div><label class="music-setting">Music <input id="musicVolume" type="range" min="0" max="50" step="1" value="22" aria-label="Music volume"><span class="small">0 = muted</span></label><label>Difficulty <select id="difficulty"><option value="0.8">Story</option><option value="1" selected>Normal</option><option value="1.25">Hard</option><option value="1.55">Rombie</option></select></label><p class="small">Difficulty changes enemy health and damage. Enemies telegraph their attacks. Use C to dodge and Shift to sprint.</p><div class="row"><button class="btn" id="exportBtn">Export Data</button><label class="btn" style="cursor:pointer">Import Data<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn" id="creditsBtn">Credits</button><button class="btn" id="resetBtn">Reset Save</button></div><div id="credits" style="display:none;margin-top:18px;border-top:1px solid #ffffff22;padding-top:14px;line-height:1.7"><b>Game Creator: Max Pavlov</b><br><b>Coder: ChatGPT</b><br><b>Creators of Rombies:</b><br>Raphael<br>Ada<br>Shane<br>Max<br>Oliver<br>Raleigh</div></div></div>
+<div id="settingsModal" class="modal"><div class="modalCard"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2>Settings</h2><button class="btn" id="closeSettings">Close</button></div><label class="music-setting">Music <input id="musicVolume" type="range" min="0" max="50" step="1" value="22" aria-label="Music volume"><span class="small">0 = muted</span></label><label>Movement wiggle <input id="movementWiggle" type="checkbox" checked aria-label="Movement wiggle"></label><label>Difficulty <select id="difficulty"><option value="0.8">Story</option><option value="1" selected>Normal</option><option value="1.25">Hard</option><option value="1.55">Rombie</option></select></label><p class="small">Difficulty changes enemy health and damage. Enemies telegraph their attacks. Use C to dodge and Shift to sprint.</p><div class="row"><button class="btn" id="exportBtn">Export Data</button><label class="btn" style="cursor:pointer">Import Data<input id="importFile" type="file" accept="application/json" hidden></label><button class="btn" id="creditsBtn">Credits</button><button class="btn" id="resetBtn">Reset Save</button></div><div id="credits" style="display:none;margin-top:18px;border-top:1px solid #ffffff22;padding-top:14px;line-height:1.7"><b>Game Creator: Max Pavlov</b><br><b>Coder: ChatGPT</b><br><b>Creators of Rombies:</b><br>Raphael<br>Ada<br>Shane<br>Max<br>Oliver<br>Raleigh</div></div></div>
 <div id="toast" class="toast"></div>
 </div></div></div>
 <script src="assets.js"></script>
 <script src="data.js"></script><script src="game.js"></script>
-<script src="chapter2-art.js?v=20261009"></script>
-<script src="chapter2-scenes.js?v=20261009"></script>
-<script src="chapter2-schema.js?v=20261009"></script>
-<script src="chapter2-media.js?v=20261009"></script>
-<script src="chapter2-cloud.js?v=20261009"></script>
-<script src="chapter2-content.js?v=20261009"></script>
-<script src="chapter2-audio.js?v=20261009"></script><script src="chapter2-arena.js?v=20261009"></script>
-<script src="chapter2-story.js?v=20261009"></script>
-<script src="chapter2-app.js?v=20261009"></script>
-<script src="chapter2-editor.js?v=20261009"></script>
+<script src="chapter2-art.js?v=20261009sandbox"></script>
+<script src="chapter2-scenes.js?v=20261009sandbox"></script>
+<script src="chapter2-schema.js?v=20261009sandbox"></script>
+<script src="chapter2-media.js?v=20261009sandbox"></script>
+<script src="chapter2-cloud.js?v=20261009sandbox"></script>
+<script src="chapter2-content.js?v=20261009sandbox"></script>
+<script src="chapter2-audio.js?v=20261009sandbox"></script><script src="chapter2-arena.js?v=20261009sandbox"></script>
+<script src="chapter2-story.js?v=20261009sandbox"></script>
+<script src="chapter2-app.js?v=20261009sandbox"></script>
+<script src="chapter2-editor.js?v=20261009sandbox"></script>
 </body>
 </html>
 
