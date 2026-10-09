@@ -1,3 +1,15 @@
+# Shared-password admin panel, chat and rotated hitboxes — October 9
+
+- Sandbox now has an Admin panel button. Password 0219 directly unlocks controls; no manually granted Firebase administrator or Admin SDK is required. An existing username is used or one is connected automatically. Sessions last one hour and closing the panel locks it.
+- Global announcements appear above every game/chat layer at the top center. Set their duration or clear them. Admin notices go to a specific username. They still work with ordinary chat disabled.
+- Live # global chat, private two-person DMs, persistent message history, exact username lookup, paged username directory, ban/unban and chat toggle are available. Messages are plain text and posting has a two-second server-enforced cooldown.
+- Rotated obstacles now use oriented geometry for movement, cover, platforms, damage/heal/bounce areas, melee, projectiles and beams. The visible rectangular shape and physics share their rotation.
+- Preserves Chapter One normal battle presentation/fullscreen, creator-only Playtest layout, separate arena sizing, drag/resize/rotate/mirror controls, GIFs and custom music.
+
+Install: upload every file from Rombies-GitHub-fixes.zip, including ten customize-v6 files. Publish the complete updated firestore.rules and deploy the updated upload Worker from Rombies-Sandbox-Backend.zip. Then replace CodeHS index.html with CodeHS-small-index.html. Keep existing images, variables and R2 binding. No Realtime Database, new secret or manual admin registration is needed. ADMIN-CHAT-SETUP.md gives every step.
+
+173 automated checks passed: 24 engine/story/presentation, 17 customization, 10 selection handles, 14 GIF/music storage, 15 Worker, 9 cloud, 11 audio, 3 music schema, 8 obstacle/deletion, 10 rotated physics and 52 real Firestore emulator access checks. Browser checks used the real Firebase Web SDK against only the local demo emulator: shared-password unlock without a role, global announcements, private notices, live two-account DMs, ban/unban and chat disable/enable. No production publishing, moderation or deployment was performed.
+
 # Current verification — October 9
 
 110 automated checks passed: 24 engine/story/presentation, 17 customization, 10 selection handles, 14 GIF/music storage, 14 Worker, 9 cloud, 11 music lifecycle, 3 music schema and 8 obstacle/deletion checks. All cloud/Worker tests use mock services.
