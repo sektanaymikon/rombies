@@ -1,5 +1,7 @@
 # Latest customization verification — October 9
 
+Sprite dragging correction: nine new selection checks pass for direct character selection, switching to another sprite, corner resizing, rotation, floor/background priority and hidden attack previews. Browser pointer drags selected and moved Shane while the floor was selected, then resized Shane from 130 × 155 to 220 × 215 without using the object dropdown. Updated downloads use fresh customize-v3 filenames.
+
 70 automated regression groups pass: 24 engine/story/presentation, 17 sandbox customization, 11 GIF, 11 mocked Worker and 7 mocked cloud checks. All attack kinds and ultimates retain independent attack-art and attack-pose transforms through public schema normalization.
 
 Real browser pointer drags resized uploaded attack art from 150 × 8 to 290 × 108; a separate character pose from 280 × 350 to 400 × 450; and an enemy ultimate from 180 × 180 to 290 × 260. Its horizontal mirror toggled successfully. A separate world handle enlarged the arena from 2000 × 1100 to 2364 × 1300. A UI-exported JSON confirmed the character stayed 280 × 350 at X 234, resized attack/pose dimensions stayed unchanged, and the obstacle stayed 133 × 168 at X 906. Background filled the new arena with preserved proportions. No production publishing was performed.
