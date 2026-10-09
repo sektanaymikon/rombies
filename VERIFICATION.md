@@ -1,3 +1,9 @@
+# Current verification — October 9
+
+110 automated checks passed: 24 engine/story/presentation, 17 customization, 10 selection handles, 14 GIF/music storage, 14 Worker, 9 cloud, 11 music lifecycle, 3 music schema and 8 obstacle/deletion checks. All cloud/Worker tests use mock services.
+
+Browser checks confirmed a 60° color obstacle and its outline rotate in both Playtest and normal Chapter One style battles. My fights shows both publication states; only the unpublished card offers Delete fight. Its confirmation and Keep fight cancellation worked. No production deletion occurred. Battle console contained no errors.
+
 # Rotation, attack menus and music verification
 
 101 automated checks pass: 24 engine/story/presentation, 17 customization, 10 selection/rotation handles, 14 GIF/music storage, 14 Worker, 8 cloud, 11 audio lifecycle and 3 music schema checks. Worker/cloud checks mock external services and perform no production writes.
