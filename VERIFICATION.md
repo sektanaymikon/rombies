@@ -1,3 +1,11 @@
+# Rotation, attack menus and music verification
+
+101 automated checks pass: 24 engine/story/presentation, 17 customization, 10 selection/rotation handles, 14 GIF/music storage, 14 Worker, 8 cloud, 11 audio lifecycle and 3 music schema checks. Worker/cloud checks mock external services and perform no production writes.
+
+Real browser checks: attack art rotation +15°; separate attack animation rotation field 45°; green-handle drag to approximately 99.64°; persisted exported rotation after reload; every default regular attack and ultimate lists both artwork and animation entries even before uploading a pose. An authored four-second WAV uploaded and decoded with readyState 4, played and looped, stopped at time zero, exported with identical bytes, imported, and played again. A music-equipped Playtest opened, paused and returned without console errors. Prior sprite movement/resizing, arena proportions and Chapter One presentation regression checks pass.
+
+R2 playback byte ranges, size limits, audio-only type validation and authentication are tested with mocked R2/Google/Firebase. Live hosting, publishing and cross-device music retrieval need the user's final deployment and hosted check.
+
 # Latest customization verification — October 9
 
 Sprite dragging correction: nine new selection checks pass for direct character selection, switching to another sprite, corner resizing, rotation, floor/background priority and hidden attack previews. Browser pointer drags selected and moved Shane while the floor was selected, then resized Shane from 130 × 155 to 220 × 215 without using the object dropdown. Updated downloads use fresh customize-v3 filenames.
