@@ -74,3 +74,16 @@ Proof: Rombies-Sandbox-customization-check.png accompanies the release files.
 No test fight was published, and no external deployment was made. Online
 Firebase/R2 behavior remains subject to the verification limits above.
 
+## Chapter One battle presentation update
+
+Normal Chapter Two and Sandbox Play (including Discover and shared-link plays)
+now use Chapter One's HUD bars, overlaid ability cards, stage framing, Settings
+button, pause-menu actions and arena-fitting fullscreen. Only the builder's
+Playtest passes playtest:true and shows the newer controls/settings layout.
+The option is local UI state, not a creator-controlled field in a published fight.
+The arena simulation, custom movesets, poses, GIFs and QTE mechanics are retained.
+Browser checks covered ordinary Play, pause/Fullscreen/Resume/return, and the
+builder Playtest layout. Existing 24 engine/presentation, 15 customization and
+11 GIF groups passed again. The online files need the supplied GitHub update;
+no production files were deployed by the assistant.
+
