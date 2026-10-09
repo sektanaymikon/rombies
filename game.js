@@ -722,6 +722,7 @@ function input(action){
 }
 const movement={KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyW:'up',ArrowUp:'up',KeyS:'down',ArrowDown:'down',ShiftLeft:'sprint',ShiftRight:'sprint'};
 addEventListener('keydown',e=>{
+ if(window.ROMBIES_EXPANSION_ACTIVE)return;
  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
  if(movement[e.code]||['Space','Tab','Enter','Escape','Digit1','Digit2','Digit3','Digit4'].includes(e.code))e.preventDefault();
  if(e.code==='Escape'){if(state.dialogue)skipDialogue();else pause();return;}
@@ -758,7 +759,8 @@ $('importFile').onchange=async e=>{
 };
 $('resetBtn').onclick=()=>{if(confirm('Reset your story progress and completed battle badges?')){save=freshSave();persist();menu();toast('Save reset. All battles remain available.');}};
 let last=performance.now(),manual=false;
-function frame(now){const dt=Math.min(.033,(now-last)/1000);last=now;if(!manual)update(dt);render();music.update();requestAnimationFrame(frame);}
+function frame(now){const dt=Math.min(.033,(now-last)/1000);last=now;if(!window.ROMBIES_EXPANSION_ACTIVE){if(!manual)update(dt);render();}music.update();requestAnimationFrame(frame);}
+window.ROMBIES_LEGACY={suspend(){keys.clear();state.paused=true;music.update();},resume(){menu();}};
 menu();assetsReady.then(()=>{if(assetErrors.length)toast(assetErrors.length+' art files could not load. Keep the assets folder with the game files.');});requestAnimationFrame(frame);
 // Browser regression harness is available only with ?test=1. Normal play exposes no debug controls.
 if(testMode)window.ROMBIES_TEST={
