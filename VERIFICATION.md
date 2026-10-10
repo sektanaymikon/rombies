@@ -1,3 +1,15 @@
+## Website usernames, force refresh and game viewing — October 10
+
+First visits now require a Rombies username before entering any game mode. The username is connected with anonymous Firebase authentication; no email is required. Existing browser usernames stay saved.
+
+Admin panel → Force refresh everyone broadcasts a five-second reload notice, saves the local draft and reloads each connected supported client with a fresh page URL. Upload GitHub files and the latest CodeHS index before using it. Players must load this version once before they can receive future refresh commands. It reloads the deployed page; it does not deploy code or migrate currently running battles. Commands expire after five minutes and a session marker prevents reload loops.
+
+Find player → username → Request game view asks that player for permission. Approving shares a game-only JPEG preview every five seconds, up to ten minutes. A visible sharing indicator includes Stop sharing. Game canvas and cutscene dialogue are included; chat, DMs, browser tabs, desktop and audio are excluded. Admin can stop viewing. Another admin cannot read a view requested by someone else. Unavailable/tainted artwork stops sharing with an explanation.
+
+Install: upload the GitHub patch including all customize-v13 aliases, replace CodeHS-small-index.html, and publish the complete NEW firestore.rules from Rombies-Sandbox-Backend.zip. Keep existing Firebase providers, indexes and upload Worker. No new Worker variable or Realtime Database needed.
+
+74 official Firestore emulator access checks passed (including 22 new refresh/view access checks), cloud API checks passed, and mocked UI checks cover first registration, consent, stop, game-only capture and refresh deduplication. No production commands, monitoring or deployment were performed.
+
 ## Wave dialogue, Add attack and save recovery
 
 Enemies & waves → Dialogue for this wave → Add wave textbox supports up to 20 textboxes per wave, with speakers, optional portraits and order controls. Dialogue pauses combat when its wave starts; Continue/Enter/Space resumes. Enable Use second cutscene scene for wave dialogue to use the separate scene, when one exists. Survive-mode repeats do not repeat dialogue for the same wave.
@@ -6,13 +18,13 @@ Your team or an enemy's Attack loadout now includes Add attack to moveset. It cr
 
 Leaving the builder takes a final local snapshot and waits for queued online saves. If local saving fails it keeps the editor open. Reopening My fights prefers a newer linked local draft over stale shared data; online edits reuse the linked local draft instead of creating duplicates. Ultimate name, damage, rotation and regular attacks were checked through actual draft storage and leave/reopen paths.
 
-Wave editor/runtime, cutscene, save recovery, autosave, customization, cloud and rotated physics checks passed using local mocks. Upload the latest GitHub patch including customize-v12 aliases and replace the small CodeHS index. No backend update needed.
+Wave editor/runtime, cutscene, save recovery, autosave, customization, cloud and rotated physics checks passed using local mocks. Upload the latest GitHub patch including customize-v13 aliases and replace the small CodeHS index. No backend update needed.
 
 ## Rotated obstacle placement limits
 
 Dragging, saved configurations, duplicates and arena resizing now constrain the rotated obstacle footprint. A rotated obstacle can reach the roof without its former upright rectangle blocking movement. Negative logical X/Y are retained when the visible rotated shape is inside the arena. Applies to battle and second/cutscene scenes. 34 boundary checks plus rotated physics and cutscene regressions passed.
 
-Upload the latest patch including customize-v12 files, replace CodeHS index, and reload. No backend changes required.
+Upload the latest patch including customize-v13 files, replace CodeHS index, and reload. No backend changes required.
 
 ## Sandbox cutscenes, second scene, duplication and transparency
 
@@ -24,19 +36,19 @@ Ctrl+C copies the selected obstacle, Ctrl+V pastes, Ctrl+D duplicates in the are
 
 Edit obstacle now has Transparency (%) from 0 opaque to 100 invisible. It affects rendering only; collision remains. All settings autosave, export/import and publish with the fight.
 
-New cutscene runtime/editor/schema checks and existing customization, autosave, selection, durability, music and cloud regression checks passed using local mocks. No live Firebase writes. Upload all patch files including ten customize-v12 aliases and replace the small CodeHS index. No backend update is required.
+New cutscene runtime/editor/schema checks and existing customization, autosave, selection, durability, music and cloud regression checks passed using local mocks. No live Firebase writes. Upload all patch files including ten customize-v13 aliases and replace the small CodeHS index. No backend update is required.
 
 ## Rotated editor selection fix
 
 Selection outlines, corner handles, rotation handles and pointer picking now follow the visible rotated artwork for obstacles and other editor objects. Dragging a rotated corner resizes along local axes and keeps its opposite corner fixed. Rotation and collision geometry in battles remain oriented. 51 rotated-selection/resize checks and 10 selection regression checks passed.
 
-Upload all files in the GitHub patch (including customize-v12 aliases) and replace the small CodeHS index. No backend update needed.
+Upload all files in the GitHub patch (including customize-v13 aliases) and replace the small CodeHS index. No backend update needed.
 
 ## Obstacle durability and invincibility
 
 Arena & obstacles → Edit obstacle now has Obstacle durability (1–1,000,000) and an Invincible checkbox. All obstacle types support these settings. Destructible obstacles disappear and stop affecting the fight at zero durability. Invincible obstacles retain collision/effects and ignore damage. Existing non-cover obstacles remain invincible by default to preserve older fights. Settings autosave and survive public fight serialization. 21 durability/invincibility checks and 10 rotated-physics regression checks passed.
 
-Upload all files from the new GitHub patch, including ten customize-v12 files, and replace the small CodeHS index. No backend update is required for these controls.
+Upload all files from the new GitHub patch, including ten customize-v13 files, and replace the small CodeHS index. No backend update is required for these controls.
 
 # Automatic saving and shared music — October 9
 
@@ -46,7 +58,7 @@ Upload all files from the new GitHub patch, including ten customize-v12 files, a
 - If sync fails, the local draft remains saved. Retry online save sends it again. Automatically saved drafts retain their online fight link.
 - Normal battle settings now include Music volume controls.
 
-Install this update: upload all files from Rombies-GitHub-fixes.zip to the repository root, replacing matching filenames, including the ten customize-v12 files. Replace CodeHS index.html with CodeHS-small-index.html. No additional backend change is needed if the previous admin/chat backend is already deployed. For an older fight whose music was only local, open its latest local draft, select the music and press Update/Publish once to link that saved draft to the online fight.
+Install this update: upload all files from Rombies-GitHub-fixes.zip to the repository root, replacing matching filenames, including the ten customize-v13 files. Replace CodeHS index.html with CodeHS-small-index.html. No additional backend change is needed if the previous admin/chat backend is already deployed. For an older fight whose music was only local, open its latest local draft, select the music and press Update/Publish once to link that saved draft to the online fight.
 
 63 focused automated checks passed in this update: 10 autosave, 10 cloud, 15 GIF/music media, 11 audio and 17 customization. These use local mocks and make no production writes. JavaScript syntax and archive/file-size checks are run during packaging.
 
@@ -58,7 +70,7 @@ Install this update: upload all files from Rombies-GitHub-fixes.zip to the repos
 - Rotated obstacles now use oriented geometry for movement, cover, platforms, damage/heal/bounce areas, melee, projectiles and beams. The visible rectangular shape and physics share their rotation.
 - Preserves Chapter One normal battle presentation/fullscreen, creator-only Playtest layout, separate arena sizing, drag/resize/rotate/mirror controls, GIFs and custom music.
 
-Install: upload every file from Rombies-GitHub-fixes.zip, including ten customize-v12 files. Publish the complete updated firestore.rules and deploy the updated upload Worker from Rombies-Sandbox-Backend.zip. Then replace CodeHS index.html with CodeHS-small-index.html. Keep existing images, variables and R2 binding. No Realtime Database, new secret or manual admin registration is needed. ADMIN-CHAT-SETUP.md gives every step.
+Install: upload every file from Rombies-GitHub-fixes.zip, including ten customize-v13 files. Publish the complete updated firestore.rules and deploy the updated upload Worker from Rombies-Sandbox-Backend.zip. Then replace CodeHS index.html with CodeHS-small-index.html. Keep existing images, variables and R2 binding. No Realtime Database, new secret or manual admin registration is needed. ADMIN-CHAT-SETUP.md gives every step.
 
 173 automated checks passed: 24 engine/story/presentation, 17 customization, 10 selection handles, 14 GIF/music storage, 15 Worker, 9 cloud, 11 audio, 3 music schema, 8 obstacle/deletion, 10 rotated physics and 52 real Firestore emulator access checks. Browser checks used the real Firebase Web SDK against only the local demo emulator: shared-password unlock without a role, global announcements, private notices, live two-account DMs, ban/unban and chat disable/enable. No production publishing, moderation or deployment was performed.
 
