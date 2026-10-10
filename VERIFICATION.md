@@ -185,3 +185,7 @@ builder Playtest layout. Existing 24 engine/presentation, 15 customization and
 11 GIF groups passed again. The online files need the supplied GitHub update;
 no production files were deployed by the assistant.
 
+
+## Viewer update v15
+Mocked client checks passed: cached empty/old sessions do not cancel new viewing, background admin renders preserve the viewer, received frames display in panel and fullscreen, fullscreen closes cleanly, player notice has no Stop sharing button. Eleven cloud checks passed. No live production viewing was performed. Firestore rules unchanged from v14.
+
